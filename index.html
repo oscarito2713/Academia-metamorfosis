@@ -1,0 +1,161 @@
+<!-- LOGIN HTML COMPLETO FUNCIONAL -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Metamorfosis Creativa</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff4e50, #f9d423);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    h1, h2, h3 {
+      text-align: center;
+      margin: 5px 0;
+      color: #333;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #ff4e50;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #e1403f;
+    }
+    .busqueda {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .separado {
+      display: flex;
+      gap: 10px;
+    }
+    .separado input {
+      flex: 1;
+    }
+    .separado button {
+      flex: 0.5;
+      background-color: #4caf50;
+    }
+    .result-box {
+      margin-top: 20px;
+      background-color: #f2f2f2;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .dato {
+      margin-bottom: 8px;
+    }
+    .dato span {
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .separado {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ACADEMIA METAMORFOSIS CREATIVA</h1>
+    <h2>Login de Usuario</h2>
+    <input type="text" id="usuario" placeholder="Usuario" />
+    <input type="password" id="contrasena" placeholder="Contraseña" />
+    <input type="text" id="dniLogin" placeholder="DNI" />
+    <button onclick="validarLogin()">Ingresar</button>
+
+    <div class="busqueda">
+      <h3>Búsqueda por DNI</h3>
+      <div class="separado">
+        <input type="text" id="dniBuscar" placeholder="Ingrese DNI" />
+        <button onclick="buscarDNI()">Buscar</button>
+      </div>
+    </div>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    function redondearPromedio(prom) {
+      const decimal = prom - Math.floor(prom);
+      return decimal >= 0.6 ? Math.ceil(prom) : Math.floor(prom);
+    }
+
+    function buscarDNI() {
+      const dni = document.getElementById("dniBuscar").value.trim();
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "";
+
+      const listaEstudiantes = JSON.parse(localStorage.getItem("estudiantes")) || [];
+      const estudiante = listaEstudiantes.find((e) => e.dni === dni);
+
+      if (estudiante) {
+        const promedio = redondearPromedio(
+          estudiante.notas.reduce((a, b) => a + b, 0) / estudiante.notas.length
+        );
+        resultado.innerHTML = `
+          <div class="result-box">
+            <div class="dato"><span>DNI:</span> ${estudiante.dni}</div>
+            <div class="dato"><span>Apellidos:</span> ${estudiante.apellidos}</div>
+            <div class="dato"><span>Nombres:</span> ${estudiante.nombres}</div>
+            <div class="dato"><span>Tarea 1:</span> ${estudiante.notas[0]}</div>
+            <div class="dato"><span>Tarea 2:</span> ${estudiante.notas[1]}</div>
+            <div class="dato"><span>Tarea 3:</span> ${estudiante.notas[2]}</div>
+            <div class="dato"><span>Tarea 4:</span> ${estudiante.notas[3]}</div>
+            <div class="dato"><span>Promedio:</span> ${promedio}</div>
+          </div>
+        `;
+      } else {
+        resultado.innerHTML =
+          '<p style="text-align:center; margin-top:10px;">No se encontró al estudiante</p>';
+      }
+    }
+
+    function validarLogin() {
+      const usuario = document.getElementById("usuario").value.trim();
+      const contrasena = document.getElementById("contrasena").value.trim();
+      const dni = document.getElementById("dniLogin").value.trim();
+
+      if (
+        usuario === "oscar636868" &&
+        contrasena === "63686810" &&
+        dni === "63686810"
+      ) {
+        window.location.href = "panel.html";
+      } else {
+        alert("Usuario, contraseña o DNI incorrectos");
+      }
+    }
+  </script>
+</body>
+</html>
+
+

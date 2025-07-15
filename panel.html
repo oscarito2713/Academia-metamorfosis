@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Metamorfosis Creativa</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f6f6f6;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .sidebar {
+      width: 100%;
+      max-width: 220px;
+      background: #ff4e50;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+    }
+    .sidebar h2 {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .sidebar button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      background-color: white;
+      color: #ff4e50;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .sidebar button:hover { background-color: #ffe2e3; }
+    .main {
+      flex: 1;
+      padding: 20px;
+      min-width: 300px;
+    }
+    h1 { text-align: center; color: #333; }
+    .formulario, .tabla-estudiantes { margin-top: 20px; }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button.registrar {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .busqueda input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      font-size: 14px;
+    }
+    table th, table td {
+      padding: 6px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+    table th { background-color: #f0f0f0; }
+    .subir-notas-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .subir-notas-box select {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .btn { padding: 4px 8px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-edit { background-color: #2196F3; color: white; }
+    .btn-delete { background-color: #f44336; color: white; }
+    .btn-print { background-color: #4caf50; color: white; padding: 8px; float: right; margin-bottom: 10px; }
+    @media print {
+      .sidebar, .btn, input, select { display: none; }
+      h1::before {
+        content: "ACADEMIA DE ORATORIA Y LIDERAZGO"; display: block; font-size: 20px; font-weight: bold;
+      }
+      h1::after {
+        content: "NOTAS DE APRENDIZAJE"; display: block; font-size: 16px; margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Bienvenidos al sistema</h2>
+    <p>ACADEMIA DE ORATORIA Y LIDERAZGO METAMORFOSIS CREATIVA</p>
+    <button onclick="mostrarSeccion('inscripcion')">Inscribir</button>
+    <button onclick="mostrarSeccion('notas')">Subir Notas</button>
+    <button onclick="mostrarSeccion('lista')">Lista de Estudiantes</button>
+  </div>
+  <div class="main">
+    <h1 id="titulo">Inscripción de Estudiantes</h1>
+    <div id="inscripcion" class="formulario">
+      <input type="text" id="dni" placeholder="DNI">
+      <input type="text" id="apellidos" placeholder="Apellidos">
+      <input type="text" id="nombres" placeholder="Nombres">
+      <select id="turno">
+        <option value="">Seleccione Turno</option>
+        <option value="Mañana">Mañana</option>
+        <option value="Tarde">Tarde</option>
+        <option value="Noche">Noche</option>
+      </select>
+      <input type="text" id="telefono" placeholder="Teléfono">
+      <div style="margin-top: 10px;">
+        <button class="registrar" onclick="registrarEstudiante()">Registrar</button>
+      </div>
+    </div>
+    <div id="notas" class="formulario" style="display: none;">
+      <div class="subir-notas-box">
+        <h3>Subir Tarea</h3>
+        <select id="tareaSeleccionada" onchange="mostrarFormularioNotas()">
+          <option value="0">Tarea 1</option>
+          <option value="1">Tarea 2</option>
+          <option value="2">Tarea 3</option>
+          <option value="3">Tarea 4</option>
+        </select>
+        <div id="formNotas"></div>
+      </div>
+    </div>
+    <div id="lista" class="tabla-estudiantes" style="display: none;">
+      <input type="text" id="busquedaApellido" oninput="filtrarPorApellido()" placeholder="Buscar por apellidos">
+      <button class="btn-print" onclick="window.print()">Imprimir Notas</button>
+      <table>
+        <thead>
+          <tr>
+            <th>DNI</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Teléfono</th>
+            <th>Tarea 1</th>
+            <th>Tarea 2</th>
+            <th>Tarea 3</th>
+            <th>Tarea 4</th>
+            <th>Promedio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCuerpo"></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    let listaEstudiantes = JSON.parse(localStorage.getItem('estudiantes')) || [];
+    function guardarEnLocalStorage() {
+      localStorage.setItem('estudiantes', JSON.stringify(listaEstudiantes));
+    }
+    function mostrarSeccion(seccion) {
+      document.getElementById('inscripcion').style.display = 'none';
+      document.getElementById('notas').style.display = 'none';
+      document.getElementById('lista').style.display = 'none';
+      document.getElementById(seccion).style.display = 'block';
+      document.getElementById('titulo').innerText =
+        seccion === 'inscripcion' ? 'Inscripción de Estudiantes' :
+        seccion === 'notas' ? 'Subir Notas' :
+        'Lista de Estudiantes';
+      if (seccion === 'lista') mostrarTabla();
+      if (seccion === 'notas') mostrarFormularioNotas();
+    }
+    function registrarEstudiante() {
+      const dni = document.getElementById("dni").value.trim();
+      const apellidos = document.getElementById("apellidos").value.trim();
+      const nombres = document.getElementById("nombres").value.trim();
+      const turno = document.getElementById("turno").value;
+      const telefono = document.getElementById("telefono").value.trim();
+      if (!dni || !apellidos || !nombres || !turno || !telefono) {
+        alert("Todos los campos son obligatorios.");
+        return;
+      }
+      listaEstudiantes.push({ dni, apellidos, nombres, turno, telefono, notas: [0, 0, 0, 0] });
+      guardarEnLocalStorage();
+      alert("Estudiante registrado correctamente.");
+      document.getElementById("dni").value = "";
+      document.getElementById("apellidos").value = "";
+      document.getElementById("nombres").value = "";
+      document.getElementById("turno").value = "";
+      document.getElementById("telefono").value = "";
+    }
+    function redondearPromedio(prom) {
+      const decimal = prom - Math.floor(prom);
+      return decimal >= 0.6 ? Math.ceil(prom) : Math.floor(prom);
+    }
+    function mostrarTabla() {
+      const cuerpo = document.getElementById("tablaCuerpo");
+      cuerpo.innerHTML = "";
+      listaEstudiantes.forEach((est, index) => {
+        const prom = redondearPromedio(est.notas.reduce((a, b) => a + b, 0) / 4);
+        cuerpo.innerHTML += `
+          <tr>
+            <td contenteditable onblur="editarCampo(${index}, 'dni', this.innerText)">${est.dni}</td>
+            <td contenteditable onblur="editarCampo(${index}, 'nombres', this.innerText)">${est.nombres}</td>
+            <td contenteditable onblur="editarCampo(${index}, 'apellidos', this.innerText)">${est.apellidos}</td>
+            <td contenteditable onblur="editarCampo(${index}, 'telefono', this.innerText)">${est.telefono}</td>
+            <td>${est.notas[0]}</td>
+            <td>${est.notas[1]}</td>
+            <td>${est.notas[2]}</td>
+            <td>${est.notas[3]}</td>
+            <td>${prom}</td>
+            <td>
+              <button class="btn btn-edit" onclick="alert('Edita directamente en los campos.')">Editar</button>
+              <button class="btn btn-delete" onclick="eliminarEstudiante(${index})">Eliminar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+    function editarCampo(index, campo, valor) {
+      listaEstudiantes[index][campo] = valor.trim();
+      guardarEnLocalStorage();
+    }
+    function eliminarEstudiante(index) {
+      if (confirm("¿Estás seguro de eliminar este estudiante?")) {
+        listaEstudiantes.splice(index, 1);
+        guardarEnLocalStorage();
+        mostrarTabla();
+      }
+    }
+    function filtrarPorApellido() {
+      const texto = document.getElementById("busquedaApellido").value.toLowerCase();
+      const filas = document.querySelectorAll("#tablaCuerpo tr");
+      filas.forEach(fila => {
+        const apellido = fila.children[2].innerText.toLowerCase();
+        fila.style.display = apellido.includes(texto) ? "" : "none";
+      });
+    }
+    function mostrarFormularioNotas() {
+      const contenedor = document.getElementById("formNotas");
+      contenedor.innerHTML = "";
+      const tareaIndex = parseInt(document.getElementById("tareaSeleccionada").value);
+      listaEstudiantes.forEach((est, idx) => {
+        contenedor.innerHTML += `
+          <div style="margin-bottom:10px;">
+            <label><strong>${est.nombres} ${est.apellidos}</strong> (${est.dni}): </label>
+            <input type="number" min="0" max="20" style="width:80px;" onchange="actualizarNota(${idx}, ${tareaIndex}, this.value)">
+          </div>
+        `;
+      });
+    }
+    function actualizarNota(estIndex, tareaIndex, valor) {
+      const nota = parseFloat(valor);
+      if (!isNaN(nota) && nota >= 0 && nota <= 20) {
+        listaEstudiantes[estIndex].notas[tareaIndex] = nota;
+        guardarEnLocalStorage();
+      }
+    }
+    window.onload = () => mostrarSeccion('inscripcion');
+  </script>
+</body>
+</html>
+
